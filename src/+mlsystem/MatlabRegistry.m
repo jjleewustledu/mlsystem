@@ -11,12 +11,13 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
     
     properties (Constant)
         MLPACKAGES = {  ...
-            'mlaif'      'mlanalysis'   'mlaveraging'  'mlbayesian'  'mlbet'       'mlcaster'    'mlct' 'mlchoosers' ...
-            'mldb'       'mlentropy'    'mlfourd'      'mlfsl'       'mlio'        'mlkety' ...
-            'mlmr'       'mlnest'       'mlniftitools' 'mlparallel'  'mlpatterns'  'mlperfusion' 'mlpet' ...
-            'mlpipeline' 'mlpublish'    'mlrois'       'mlsurfer'    'mlsystem'    'mlunpacking' ...
-            'mlusmle'    'mlstep2cs'    'mlarbelaez'   'mldistcomp'};
-        MLV_SERIAL = '7_9';
+            'mlaif'       'mlanalysis' 'mlarbelaez' 'mlaveraging'  'mlbayesian' 'mlbet'      'mlcaster' ...
+            'mlct'        'mlchoosers' 'mldb'       'mldistcomp'   'mlentropy'  'mlfourd'    'mlfsl' ...
+            'mlio'        'mlkety'     'mlmr'       'mlniftitools' 'mlnest'     'mlparallel' 'mlpatterns' 'mlperfusion' ...
+            'mlpet'       'mlpipeline' 'mlpublish'  'mlrois'       'mlstep2cs'  'mlsurfer'   'mlsystem' ...
+            'mlunpacking' 'mlusmle' } 
+        MLV_SERIAL = '7_9'
+        MIN_VERSION = '7.11.0'
     end
     
     properties
@@ -29,6 +30,7 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
         mexroot
         srcroot
         randstream
+        useDip    = false;
     end
     
     methods (Static)
@@ -68,10 +70,10 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
             this.setTestPath();
             this.setMexPath();
             this.setFslPath();
-            % this.setDip();
+            if (this.useDip)
+                this.setDip(); end
         end
         function setDip(this)
-            %if (isempty(strfind(path, this.dipcommon)))
             path([...
                 fullfile(this.dipcommon, 'dipimage') pathsep ...
                 fullfile(this.dipcommon, 'dipimage/demos') pathsep ...
@@ -85,7 +87,6 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
                 fullfile(this.dipcommon,['mlv' this.MLV_SERIAL '/diplib_dbg']) pathsep ...
                 fullfile(this.dipos,     'lib')];
             setenv(this.llpenv, [dipllp pathsep getenv(this.llpenv)]);
-            %end
             try
                 dip_initialise
                 dipsetpref('CommandFilePath',[this.srcroot, 'mlcvl/dipcommands']);
@@ -99,11 +100,8 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
             end
         end
         function setFslPath(this)
-            path( ...
-                fullfile(this.srcroot,  'mlcvl/mlniftitools/global'), path);
             if (isempty(strfind(path, this.fslroot(1:end-1))))
-                path(...
-                    fullfile(this.fslroot,  'etc/matlab'), path);
+                path( fullfile(this.fslroot,  'etc/matlab'), path);
             end
         end
         function setMexPath(this)
@@ -112,32 +110,33 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
             end
         end
         function setTestPath(this)
-            if (isempty(strfind(path, 'mlniftitools/tests')))
-                assert(~verLessThan('matlab', '7.11.0'));
-                path(fullfile(this.srcroot, 'mlcvl/mlniftitools/test'), path);
-                for p = 1:length(this.MLPACKAGES) %#ok<*FORFLG>
-                    path(fullfile(this.srcroot, 'mlcvl', this.MLPACKAGES{p}, 'test'), path);
+            assert(~verLessThan('matlab', this.MIN_VERSION));
+            for p = 1:length(this.MLPACKAGES) %#ok<*FORFLG>    
+                testPth = fullfile(this.srcroot, 'mlcvl', this.MLPACKAGES{p}, 'test');
+                if (isempty(strfind(path, testPth)))
+                    path(testPth, path);
                 end
             end
         end
         function setSrcPath(this)
-            if (isempty(strfind(path, 'mfiles')))
-                assert(~verLessThan('matlab', '7.11.0'));
-                path([...
-                    fullfile(this.srcroot, 'mlcvl/dicom_sort_convert/src') pathsep ...
-                    fullfile(this.srcroot, 'mlcvl/dicom_spectrum/src') pathsep ...
-                    fullfile(this.srcroot, 'mlcvl/export_fig') pathsep ...
-                    fullfile(this.srcroot, 'mlcvl/explorestruct') pathsep ...
-                    fullfile(this.srcroot, 'mlcvl/lutbar') pathsep ... 
-                    fullfile(this.srcroot, 'mlcvl/mfiles') pathsep ...
-                    fullfile(this.srcroot, 'mlcvl/mlniftitools/src/') pathsep ...
-                    fullfile(this.srcroot, 'mlcvl/StructBrowser') pathsep ...
-                    fullfile(this.srcroot, 'mlcvl/xml_io_tools') ...
-                    ], path);
-                for p = 1:length(this.MLPACKAGES) %#ok<*FORFLG>
-                    path(fullfile(this.srcroot, 'mlcvl', this.MLPACKAGES{p}, 'src'), path);
+            assert(~verLessThan('matlab', this.MIN_VERSION));
+            for p = 1:length(this.MLPACKAGES) %#ok<*FORFLG>
+                srcPth = fullfile(this.srcroot, 'mlcvl', this.MLPACKAGES{p}, 'src');
+                if (isempty(strfind(path, srcPth)))
+                    path(srcPth, path);
                 end
             end
+            path([...
+                fullfile(this.srcroot, 'mlcvl/dicom_sort_convert/src') pathsep ...
+                fullfile(this.srcroot, 'mlcvl/dicom_spectrum/src') pathsep ...
+                fullfile(this.srcroot, 'mlcvl/export_fig') pathsep ...
+                fullfile(this.srcroot, 'mlcvl/explorestruct') pathsep ...
+                fullfile(this.srcroot, 'mlcvl/lutbar') pathsep ... 
+                fullfile(this.srcroot, 'mlcvl/mfiles') pathsep ...
+                fullfile(this.srcroot, 'mlcvl/mlniftitools/global') pathsep ...
+                fullfile(this.srcroot, 'mlcvl/StructBrowser') pathsep ...
+                fullfile(this.srcroot, 'mlcvl/xml_io_tools') ...
+                ], path);
         end        
         function clear(this)
             this.delete;
@@ -145,20 +144,22 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
         end
     end
     
+    %% PRIVATE
+    
     methods (Access=private)        
         function this = MatlabRegistry()
-            if (exist(          '/Library/Documentation/Applications/','dir'))
+            if (exist(         '/Library/Documentation/Applications/','dir'))
                 this.docroot = '/Library/Documentation/Applications/';
-            elseif (exist(       [getenv('HOME') '/Library/Documentation/Applications/'],'dir'))
+            elseif (exist(     [getenv('HOME') '/Library/Documentation/Applications/'],'dir'))
                 this.docroot = [getenv('HOME') '/Library/Documentation/Applications/'];
             end
             switch (computer('arch'))
                 case 'maci64'
-                    this.llpenv       = 'DYLD_LIBRARY_PATH';
-                    this.dipos = '/opt/dip/Darwin/';
+                    this.llpenv = 'DYLD_LIBRARY_PATH';
+                    this.dipos  = '/opt/dip/Darwin/';
                 case {'glnxa64' 'glnx86'}
-                    this.llpenv       =   'LD_LIBRARY_PATH';
-                    this.dipos = '/opt/dip/Linux/';
+                    this.llpenv =   'LD_LIBRARY_PATH';
+                    this.dipos  = '/opt/dip/Linux/';
                 otherwise
                     error('mlsystem:NotImplemented', 'MatlabRegistry.ctor.computer() -> %s\n', computer('arch'));
             end
