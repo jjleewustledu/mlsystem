@@ -11,11 +11,11 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
     
     properties (Constant)
         MLPACKAGES = {  ...
-            'mlaif'       'mlanalysis' 'mlarbelaez' 'mlaveraging'  'mlbayesian' 'mlbet'      'mlcaster' ...
-            'mlct'        'mlchoosers' 'mldb'       'mldistcomp'   'mlentropy'  'mlfourd'    'mlfsl' ...
-            'mlio'        'mlkety'     'mlmr'       'mlniftitools' 'mlnest'     'mlparallel' 'mlpatterns' 'mlperfusion' ...
-            'mlpet'       'mlpipeline' 'mlpublish'  'mlrois'       'mlstep2cs'  'mlsurfer'   'mlsystem' ...
-            'mlunpacking' 'mlusmle' } 
+            'mlaif'       'mlanalysis' 'mlarbelaez'  'mlaveraging'  'mlbayesian' 'mlbet'      'mlcaster' ...
+            'mlct'        'mlchoosers' 'mldb'        'mldistcomp'   'mlentropy'  'mlfourd'    'mlfsl' ...
+            'mlio'        'mlkety'     'mlmr'        'mlniftitools' 'mlnest'     'mlparallel' 'mlpatterns' ...
+            'mlperfusion' 'mlpet'      'mlpipeline'  'mlpublish'    'mlrois'     'mlstep2cs'  'mlsurfer' ...
+            'mlsystem'    'mltvd'      'mlunpacking' 'mlusmle' } 
         MLV_SERIAL = '7_9'
         MIN_VERSION = '7.11.0'
     end
@@ -28,6 +28,7 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
         homeroot
         llpenv
         mexroot
+        nrroot
         srcroot
         randstream
         useDip    = false;
@@ -69,6 +70,7 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
             this.setSrcPath();
             this.setTestPath();
             this.setMexPath();
+            this.setNRPath();
             this.setFslPath();
             if (this.useDip)
                 this.setDip(); end
@@ -107,6 +109,11 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
         function setMexPath(this)
             if (isempty(strfind(path, this.mexroot(1:end-1))))
                 path(this.mexroot, path);
+            end
+        end
+        function setNRPath(this)
+            if (isempty(strfind(path, this.nrroot(1:end-1))))
+                path(this.nrroot, path);
             end
         end
         function setTestPath(this)
@@ -165,6 +172,7 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
             end
             this.homeroot   = [getenv('HOME') '/'];
             this.mexroot    = fullfile(this.homeroot, 'Local/mex/');
+            this.nrroot     = fullfile(this.homeroot, 'Local/src/NR300/code/');
             this.srcroot    = fullfile(this.homeroot, 'Local/src/');
             this.randstream = RandStream('mt19937ar','seed',sum(100*clock));
             RandStream.setGlobalStream(this.randstream);
