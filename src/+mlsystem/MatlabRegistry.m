@@ -70,7 +70,7 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
             this.setSrcPath();
             this.setTestPath();
             this.setMexPath();
-            this.setNRPath();
+            %this.setNRPath();
             this.setFslPath();
             if (this.useDip)
                 this.setDip(); end
