@@ -24,7 +24,7 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
         dipcommon = '/opt/dip/common/';
         dipos
         docroot
-        fslroot   = '/usr/local/fsl/';
+        fslroot
         homeroot
         llpenv
         mexroot
@@ -103,7 +103,7 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
         end
         function setFslPath(this)
             if (isempty(strfind(path, this.fslroot(1:end-1))))
-                path( fullfile(this.fslroot,  'etc/matlab'), path);
+                path(fullfile(this.fslroot,  'etc/matlab'), path);
             end
         end
         function setMexPath(this)
@@ -140,6 +140,7 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
                 fullfile(this.srcroot, 'mlcvl/explorestruct') pathsep ...
                 fullfile(this.srcroot, 'mlcvl/lutbar') pathsep ... 
                 fullfile(this.srcroot, 'mlcvl/mfiles') pathsep ...
+                fullfile(this.srcroot, 'mlcvl/f2matlab') pathsep ...
                 fullfile(this.srcroot, 'mlcvl/mlniftitools/global') pathsep ...
                 fullfile(this.srcroot, 'mlcvl/StructBrowser') pathsep ...
                 fullfile(this.srcroot, 'mlcvl/xml_io_tools') ...
@@ -168,14 +169,13 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
                     this.llpenv =   'LD_LIBRARY_PATH';
                     this.dipos  = '/opt/dip/Linux/';
                 otherwise
-                    error('mlsystem:NotImplemented', 'MatlabRegistry.ctor.computer() -> %s\n', computer('arch'));
+                    warning('mlsystem:NotImplemented', 'MatlabRegistry.ctor.computer() -> %s\n', computer('arch'));
             end
+            this.fslroot    = [getenv('FSLDIR') '/'];
             this.homeroot   = [getenv('HOME') '/'];
             this.mexroot    = fullfile(this.homeroot, 'Local/mex/');
             this.nrroot     = fullfile(this.homeroot, 'Local/src/NR300/code/');
             this.srcroot    = fullfile(this.homeroot, 'Local/src/');
-            this.randstream = RandStream('mt19937ar','seed',sum(100*clock));
-            RandStream.setGlobalStream(this.randstream);
         end
     end
 end

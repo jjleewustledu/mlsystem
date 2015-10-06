@@ -25,7 +25,7 @@ classdef Newcl
     end
     
     methods (Static)
-        function this       = makecl(pkgname, cllist, varargin)
+        function [this,cstatus] = makecl(pkgname, cllist, varargin)
             %% MAKECL guides writing a new subclassed file from templates
             %  Usage:  Newcl.makecl(pkgname, [{]classname [[pkgname2.]classname2}, classSummary, ctorUsage])
             
@@ -48,8 +48,8 @@ classdef Newcl
             this.classInfo =                     inf;
             cstatus        = this.assemblecl;
         end        
-        function this       = maketests(pkgname, cllist)
-            %% MAKECL guides writing a new class file from templates
+        function [this,cstatus] = maketests(pkgname, cllist)
+            %% MAKETESTS guides writing a new test-class file from templates
             %  Usage:  Newcl.maketests(pkgname, [{]classname [[pkgname2.]classname2}, classSummary, ctorUsage])
             %                                      ^ prefix "Test_" added as needed
             
@@ -284,8 +284,8 @@ classdef Newcl
                 '% ', cinfo.ctorUsage, ...
                 Newcl.funInheritance(cinfo));
             
-            funsig = ...
-                sprintf('\t\tfunction afun(this) \n \t\tend \n');
+%            funsig = ...
+%                sprintf('\t\tfunction afun(this) \n \t\tend \n');
             
             mhints = '';
             if (this.verbose)
