@@ -11,12 +11,10 @@ classdef Newcl
     
     properties
         classInfo
-        preamble
         classSummary
         classNotes
         propsig
         methsig
-        closing
     end
     
     properties (Dependent)
@@ -25,7 +23,7 @@ classdef Newcl
     end
     
     methods (Static)
-        function [this,cstatus] = makecl(pkgname, cllist, varargin)
+        function [cstatus,this] = makecl(pkgname, cllist, varargin)
             %% MAKECL guides writing a new subclassed file from templates
             %  Usage:  Newcl.makecl(pkgname, [{]classname [[pkgname2.]classname2}, classSummary, ctorUsage])
             
@@ -37,18 +35,18 @@ classdef Newcl
             parse(p, pkgname, cllist, varargin{:});
             cllist = ensureCell(p.Results.cllist);
                              
-            this           = mlsystem.Newcl;
-            inf.pkg        = p.Results.pkgname;
-            inf.fqpath     = this.prepareDirectories(inf.pkg, 'src');
-            inf.name       = this.queryname(     inf, cllist{1});
+            this              = mlsystem.Newcl;
+            cinfo.pkg         = p.Results.pkgname;
+            cinfo.fqpath      = this.prepareDirectories(cinfo.pkg, 'src');
+            cinfo.name        = this.queryname(     cinfo, cllist{1});
             if (length(cllist) > 1)
-                inf.subname =  cllist(2:end); end
-            inf.summary    = this.querysummary(  inf, p.Results.summary);
-            inf.ctorUsage  = this.queryctorusage(inf, p.Results.ctorUsage);
-            this.classInfo =                     inf;
-            cstatus        = this.assemblecl;
+                cinfo.subname =  cllist(2:end); end
+            cinfo.summary     = this.querysummary(  cinfo, p.Results.summary);
+            cinfo.ctorUsage   = this.queryctorusage(cinfo, p.Results.ctorUsage);
+            this.classInfo    =                     cinfo;
+            cstatus           = this.assemblecl;
         end        
-        function [this,cstatus] = maketests(pkgname, cllist)
+        function [cstatus,this] = maketests(pkgname, cllist)
             %% MAKETESTS guides writing a new test-class file from templates
             %  Usage:  Newcl.maketests(pkgname, [{]classname [[pkgname2.]classname2}, classSummary, ctorUsage])
             %                                      ^ prefix "Test_" added as needed
@@ -61,57 +59,57 @@ classdef Newcl
             if (~strncmp(     cllist{1},   'Test_', 5))
                               cllist{1} = ['Test_' cllist{1}]; end
             
-            this           = mlsystem.Newcl;
-            inf.pkg        = p.Results.pkgname;
-            inf.fqpath     = this.prepareDirectories(pkgname, 'test');
-            inf.name       = this.queryname(inf,  cllist{1});
-            inf.subname    = 'matlab.unittest.TestCase';
-            inf.summary    = '';
-            inf.ctorUsage  = '';
-            this.classInfo = inf;
-            cstatus        = this.assembletest;
+            this            = mlsystem.Newcl;
+            cinfo.pkg       = p.Results.pkgname;
+            cinfo.fqpath    = this.prepareDirectories(pkgname, 'test');
+            cinfo.name      = this.queryname(cinfo,  cllist{1});
+            cinfo.subname   = 'matlab.unittest.TestCase';
+            cinfo.summary   = '';
+            cinfo.ctorUsage = '';
+            this.classInfo  = cinfo;
+            cstatus         = this.assembletest;
         end     
-        function [cl,tests] = makeall(  pkgname, cllist, varargin)
+        function [cstatus,tstatus,cl,tests] = makeall(pkgname, cllist, varargin)
             %% MAKEALL guides writing a new class file and test file from templates
             %  Usage:  Newcl.makeall(pkgname, [{]classname [[pkgname2.]classname2}, classSummary, ctorUsage])
             %                                    ^ prefix "Test_" added as needed
             
-            cl    = mlsystem.Newcl.makecl(   pkgname, cllist, varargin{:});            
-            tests = mlsystem.Newcl.maketests(pkgname, cllist);
+            [cstatus,cl]    = mlsystem.Newcl.makecl(   pkgname, cllist, varargin{:});            
+            [tstatus,tests] = mlsystem.Newcl.maketests(pkgname, cllist);
         end
                 
-        function this       = makeBuilder(pkgname, cllist, varargin)
-            this = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
+        function [stat,this] = makeBuilder(pkgname, cllist, varargin)
+            [stat,this] = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
         end
-        function this       = makeCommand(pkgname, cllist, varargin)
-            this = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
+        function [stat,this] = makeCommand(pkgname, cllist, varargin)
+            [stat,this] = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
         end
-        function this       = makeComposite(pkgname, cllist, varargin)
-            this = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
+        function [stat,this] = makeComposite(pkgname, cllist, varargin)
+            [stat,this] = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
         end
-        function this       = makeDecorator(pkgname, cllist, varargin)
-            this = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
+        function [stat,this] = makeDecorator(pkgname, cllist, varargin)
+            [stat,this] = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
         end
-        function this       = makeInterface(pkgname, cllist, varargin)
-            this = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
+        function [stat,this] = makeInterface(pkgname, cllist, varargin)
+            [stat,this] = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
         end
-        function this       = makeIterator(pkgname, cllist, varargin)
-            this = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
+        function [stat,this] = makeIterator(pkgname, cllist, varargin)
+            [stat,this] = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
         end
-        function this       = makeMemento(pkgname, cllist, varargin)
-            this = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
+        function [stat,this] = makeMemento(pkgname, cllist, varargin)
+            [stat,this] = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
         end
-        function this       = makeSingleton(pkgname, cllist, varargin)
-            this = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
+        function [stat,this] = makeSingleton(pkgname, cllist, varargin)
+            [stat,this] = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
         end
-        function this       = makeState(pkgname, cllist, varargin)
-            this = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
+        function [stat,this] = makeState(pkgname, cllist, varargin)
+            [stat,this] = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
         end
-        function this       = makeStrategy(pkgname, cllist, varargin)
-            this = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
+        function [stat,this] = makeStrategy(pkgname, cllist, varargin)
+            [stat,this] = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
         end
-        function this       = makeVisitor(pkgname, cllist, varargin)
-            this = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
+        function [stat,this] = makeVisitor(pkgname, cllist, varargin)
+            [stat,this] = mlsystem.Newcl.makecl(pkgname, cllist, varargin{:});
         end
     end
     
@@ -131,6 +129,7 @@ classdef Newcl
     end
     
     methods (Static, Access='private')
+        
         function s     = continueComment(ntabs, commentCells)
             %% CONTINUECOMMENT formats a cell-array of strings to continue a comment to multiple lines;
             %                  use no tabs, no %-marks, no end-of-lines
@@ -150,29 +149,29 @@ classdef Newcl
             end
             s = sprintf(frmt, commentCells{:});
         end 
-        function strng = classInheritance(classInfo)
-            assert(isstruct(classInfo));
-            if (isfield(classInfo, 'subname'))
-                if (iscell(classInfo.subname))
-                    for s = 1:length(classInfo.subname)-1
-                        classInfo.subname{s} = [classInfo.subname{s} ' & '];
+        function strng = classInheritance(cinfo)
+            assert(isstruct(cinfo));
+            if (isfield(cinfo, 'subname'))
+                if (iscell(cinfo.subname))
+                    for s = 1:length(cinfo.subname)-1
+                        cinfo.subname{s} = [cinfo.subname{s} ' & '];
                     end
-                    parents = [classInfo.subname{:}];
+                    parents = [cinfo.subname{:}];
                 else
-                    parents = classInfo.subname;
+                    parents = cinfo.subname;
                 end
                 strng = sprintf('< %s', parents);
             else
                 strng = '';
             end
         end
-        function strng = funInheritance(classInfo)
-            assert(isstruct(classInfo));
-            if (isfield(classInfo, 'subname'))
-                if (iscell(classInfo.subname))
-                    parent = classInfo.subname{1};
+        function strng = funInheritance(cinfo)
+            assert(isstruct(cinfo));
+            if (isfield(cinfo, 'subname'))
+                if (iscell(cinfo.subname))
+                    parent = cinfo.subname{1};
                 else
-                    parent = classInfo.subname;
+                    parent = cinfo.subname;
                 end
                 strng = sprintf('this = this@%s%s', parent, '(varargin{:});');
             else
@@ -182,6 +181,7 @@ classdef Newcl
     end
     
     methods (Access='private')
+        
         function this      = Newcl
         end % ctor        
         function sdir      = prepareDirectories(this, pkgnam, srctype)
@@ -198,13 +198,13 @@ classdef Newcl
             sdir = fullfile(this.packageHome, pkgnam, srctype, plusdir, '');
             if (~exist(sdir, 'dir')); mkdir(sdir); end        
         end 
-        function clname    = queryname(     this, classInfo, clname)
+        function clname    = queryname(this, cinfo, clname)
             %% QUERYNAME determines a classname, querying user if the classname already exists
             %  clname = queryname(this, classInfo, clname)
             %                           ^ struct
             %                                  ^ string
             
-            fqfn = [fullfile(classInfo.fqpath, clname) this.EXT];
+            fqfn = [fullfile(cinfo.fqpath, clname) this.EXT];
             opts.Interpreter='none'; opts.Default = 'No';
             while (exist(fqfn, 'file') || exist(clname, 'class'))
                 choice = questdlg( ...
@@ -224,142 +224,126 @@ classdef Newcl
                         paramError(?meta.class, 'clname', clname);
                     end
                 end
-                fqfn = [fullfile(classInfo.fqpath, clname) this.EXT];
+                fqfn = [fullfile(cinfo.fqpath, clname) this.EXT];
             end
             assert(ischar(clname));
         end 
-        function clsummary = querysummary(  this, classInfo, clsummary) %#ok<INUSL>
-            %% QUERYSUMMARY
+        function clsummary = querysummary(this, cinfo, clsummary) %#ok<INUSL>
+            %% QUERYSUMMARY presents a dialogue box
             
-            assert(~isempty(classInfo.name));
+            assert(~isempty(cinfo.name));
             while (isempty(clsummary))
                 clsummary = inputdlg( ...
-                {sprintf(' Please summarize the class %s: ', classInfo.name), ' cont ...', ''}, ...
+                {sprintf(' Please summarize the class %s: ', cinfo.name), ' cont ...', ''}, ...
                           'Newcl.querysummary', [1 80; 1 80; 1 80 ], {'', '', ''});
                 clsummary = mlsystem.Newcl.continueComment(1, clsummary);
             end
             assert(ischar(clsummary));
         end
-        function ctorusage = queryctorusage(~,    inf,       ctorusage)
+        function ctorusage = queryctorusage(~, cinfo, ctorusage)
             if (isempty(ctorusage))
-                ctorusage = sprintf('Usage:  this = %s()', inf.name); end
+                ctorusage = sprintf('Usage:  this = %s()', cinfo.name); end
         end
         function status    = assemblecl(this)
             % ASSEMBLECL
             % TODO:  use continueComment
             
-            import mlsystem.*;
-            
-            cinfo  = this.classInfo;
-            this.preamble = ...
-                sprintf('classdef %s %s \n', cinfo.name, Newcl.classInheritance(cinfo));    
-            this.classSummary = ...
-                sprintf('\t%s %s %s \n\n', '%%', upper(cinfo.name), cinfo.summary);
-
-            chints = '';
-            if (this.verbose)
-                chints = '%  N.B. classdef (Sealed, Hidden, InferiorClasses = {?class1,?class2}, ConstructOnLoad)'; end
-            this.classNotes = ...
-                sprintf( ...
-                '\t%s \n \t%s \n \t%s \n \t%s \n \t%s \n \t%s%s \n \t%s \n \t%s \n\n', ...                
-                '%  $Revision$', ...
-                '%  was created $Date$', ...
-                '%  by $Author$, ', ...
-                '%  last modified $LastChangedDate$', ...
-                '%  and checked into repository $URL$, ', ...
-                '%  developed on Matlab ', version, ...
-                '%  $Id$', chints);  
-            
-            phints = '';
-            if (this.verbose)
-                phints = '% N.B. (Abstract, Access=private, GetAccess=protected, SetAccess=protected, Constant, Dependent, Hidden, Transient)'; end
+            import mlsystem.*;            
+            this.classNotes = this.topClassNotes(this.ctorHints);            
             this.propsig = ...
-                sprintf('\tproperties \n \t\t%s \n \tend \n\n', phints);
-            
+                sprintf('\tproperties\n \t\t%s\n \tend\n\n', this.propertyHints);            
+            cinfo = this.classInfo;
             ctorsig = ...
                 sprintf( ...
-                '\t\tfunction this = %s(varargin) \n \t\t\t%s %s \n \t\t\t%s %s \n\n \t\t\t%s \n \t\tend \n', ...
+                '\t\tfunction this = %s(varargin)\n \t\t\t%s %s\n \t\t\t%s %s\n\n \t\t\t%s\n \t\tend\n', ...
                 cinfo.name, ...
                 '%%', upper(cinfo.name), ...
                 '% ', cinfo.ctorUsage, ...
                 Newcl.funInheritance(cinfo));
             
-%            funsig = ...
-%                sprintf('\t\tfunction afun(this) \n \t\tend \n');
-            
-            mhints = '';
-            if (this.verbose)
-                mhints = '% N.B. (Static, Abstract, Access='''', Hidden, Sealed)'; end
             this.methsig = ...
                 sprintf('\tmethods \n\t\t %s \n %s \tend \n\n', ...
-                mhints, ctorsig);
-%                 sprintf('\tmethods \n \t\t%s \n\n %s %s \tend \n\n', ...
-%                 mhints, ...
-%                 funsig, ctorsig);
-            
-            this.closing = ...
-                sprintf('\t%s \nend\n\n', ...
-                '%  Created with Newcl by John J. Lee after newfcn by Frank Gonzalez-Morphy');
+                this.methodHints, ctorsig);
 
             status = this.writecl(cinfo);
+        end
+        function str       = ctorHints(this)
+            str = '';
+            if (this.verbose)
+                str = '%  N.B. classdef (Sealed, Hidden, InferiorClasses = {?class1,?class2}, ConstructOnLoad)'; 
+            end
+        end
+        function str       = propertyHints(this)
+            str = '';
+            if (this.verbose)
+                str = '% N.B. (Abstract, Access=private, GetAccess=protected, SetAccess=protected, Constant, Dependent, Hidden, Transient)'; 
+            end
+        end
+        function str       = methodHints(this)
+            str = '';
+            if (this.verbose)
+                str = '% N.B. (Static, Abstract, Access='''', Hidden, Sealed)'; 
+            end
         end
         function status    = assembletest(this)
             % ASSEMBLETEST
             % TODO:  use continueComment
             
             import mlsystem.*;            
-            cinfo  = this.classInfo;
-            
-            this.preamble = ...
-                sprintf('classdef %s %s \n', cinfo.name, Newcl.classInheritance(cinfo));    
-            this.classSummary = ...
-                sprintf('\t%s %s %s \n\n', '%%', upper(cinfo.name), cinfo.summary);
-            
+            cinfo = this.classInfo;            
             testusage   = ...
                 sprintf('\t%s%s_unittest.%s%s\n \t%s%s_unittest.%s%s\n \t%s\n\n', ...
                 '%  Usage:  >> results = run(', cinfo.pkg, cinfo.name, ')', ...
                 '%          >> result  = run(', cinfo.pkg, cinfo.name, ', ''test_dt'')', ...
-                '%  See also:  file:///Applications/Developer/MATLAB_R2014b.app/help/matlab/matlab-unit-test-framework.html');            
-            this.classNotes = ...
-                sprintf( ...
-                '\t%s \n \t%s \n \t%s \n \t%s \n \t%s \n \t%s%s \n \t%s \n\n', ...                
-                '%  $Revision$', ...
-                '%  was created $Date$', ...
-                '%  by $Author$, ', ...
-                '%  last modified $LastChangedDate$', ...
-                '%  and checked into repository $URL$, ', ...
-                '%  developed on Matlab ', version, ...
-                '%  $Id$');
-            this.classNotes = [testusage this.classNotes];   
-            
+                '%  See also:  file:///Applications/Developer/MATLAB_R2014b.app/help/matlab/matlab-unit-test-framework.html');
+            this.classNotes = [testusage this.topClassNotes];            
             this.propsig = ...
-                sprintf('\tproperties \n \t\ttestObj \n \tend \n\n');
-                       
+                sprintf('\tproperties\n \t\tregistry\n \t\ttestObj\n \tend\n\n');                       
             funsig = ...
-                sprintf('\t\tfunction test_afun(this) \n \t\t\timport %s.*; \n \t\t\t%s \n \t\t\t%s \n \t\t\t%s \n \t\tend \n', ...
+                sprintf('\t\tfunction test_afun(this)\n \t\t\timport %s.*;\n \t\t\t%s\n \t\t\t%s\n \t\t\t%s\n \t\tend\n', ...
                 cinfo.pkg, ...
                 'this.assumeEqual(1,1);', ...
                 'this.verifyEqual(1,1);', ...
                 'this.assertEqual(1,1);'); 
             setupsig = ...
-                sprintf('\t\tfunction %s(this) \n \t\t\t%s \n \t\tend \n', ...
+                sprintf('\t\tfunction %s(this)\n \t\t\t%s\n \t\t\t%s\n \t\tend\n', ...
                 ['setup' cinfo.name(6:end)], ...
-                ['this.testObj = ' cinfo.pkg '.' cinfo.name(6:end) ';']);            
+                ['import ' cinfo.pkg '.*;'], ...
+                ['this.testObj = ' cinfo.name(6:end) ';']);            
             this.methsig = ...
-                sprintf('\tmethods (Test) \n %s \tend \n\n \tmethods (TestClassSetup) \n %s \tend \n\n \tmethods (TestClassTeardown) \n \tend \n\n', ...
+                sprintf('\tmethods (Test)\n %s \tend\n\n \tmethods (TestClassSetup)\n %s \tend\n\n \tmethods (TestClassTeardown)\n \tend\n\n', ...
                 funsig, setupsig);
             
-            this.closing = ...
-                sprintf('\t%s \n end \n\n', ...
-                '%  Created with Newcl by John J. Lee after newfcn by Frank Gonzalez-Morphy');
-
             status = this.writecl(cinfo);
         end 
+        function str       = preamble(this)
+            cinfo = this.classInfo;
+            str = sprintf('classdef %s %s\n\t%s %s %s\n\n', ...
+                        cinfo.name, mlsystem.Newcl.classInheritance(cinfo), '%%', upper(cinfo.name), cinfo.summary);    
+        end
+        function str       = topClassNotes(this, varargin)
+            ip = inputParser;
+            addOptional(ip, 'classHints', '', @ischar);
+            parse(ip, varargin{:});
+            
+            str = sprintf('\t%s\n \t%s\n \t%s\n \t%s\n \t%s\n \t%s\n \t%s\n\n', ...                
+                 '%  $Revision$', ...
+                ['%  was created ' datestr(now)], ...
+                ['%  by ', getenv('USER') ','], ...
+                 '%  last modified $LastChangedDate$', ...
+                ['%  and checked into repository ' this.classInfo.fqpath '.'], ...
+                ['%% It was developed on Matlab ' version ' for ' computer '.'], ... 
+                ip.Results.classHints);  
+        end
+        function str       = closing(~)
+            str = sprintf('\t%s\n end\n\n', ...
+                '%  Created with Newcl by John J. Lee after newfcn by Frank Gonzalez-Morphy');
+        end
         function status    = writecl(this, cinfo)
             fqfn   = fullfile(cinfo.fqpath, [cinfo.name this.EXT]);
             fid    = fopen(fqfn,'w');
-            fprintf( fid, '%s%s%s%s%s%s%s', ...
-                     this.preamble, this.classSummary, this.classNotes, this.propsig, this.methsig, this.closing);
+            fprintf( fid, '%s%s%s%s%s%s', ...
+                     this.preamble, this.classNotes, this.propsig, this.methsig, this.closing);
             status = fclose(fid);
             if (status == 0)
                 % Open the written file in the MATLAB Editor/Debugger
