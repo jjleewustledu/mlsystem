@@ -28,15 +28,25 @@ classdef FilesystemRegistry < mlpatterns.Singleton
             end
         end % static instance
         
-        function        cellToTextfile(cll, fqfn)
+        function        cellToTextfile(cll, varargin)
+            ip = inputParser;
+            addRequired(ip, 'cll', @iscell);
+            parse(ip, cll);
+            
             cal = mlpatterns.CellArrayList;
-            cal.add(cll);
-            mlsystem.FilesystemRegistry.cellArrayListToTextfile(cal, fqfn);
+            cal.add(ip.Results.cll);
+            mlsystem.FilesystemRegistry.cellArrayListToTextfile(cal, varargin{:});
         end
-        function        cellArrayListToTextfile(cal, fqfn)
-            iter = cal.createIterator;
+        function        cellArrayListToTextfile(varargin)
+            ip = inputParser;
+            addRequired(ip, 'cal',        @(x) isa(x, 'mlpatterns.CellArrayList'));
+            addRequired(ip, 'fqfn',       @ischar);
+            addOptional(ip, 'perm', 'a+', @ischar);
+            parse(ip, varargin{:});
+            
+            iter = ip.Results.cal.createIterator;
             try
-                fid = fopen(fqfn, 'a+');
+                fid = fopen(ip.Results.fqfn, 'a+');
                 while (iter.hasNext)
                     fprintf(fid, '%s\n', char(iter.next));
                 end
