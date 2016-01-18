@@ -1,5 +1,5 @@
 classdef DirTools
-    %% DIRTOOLS is the composite of mlsystem.DirTool, both of which form a composite design pattern with mlsystem.DirToolComponent
+    %% DIRTOOLS extends DirTool for multiple name-arguments and cell-arrays of them.
     
     properties
         itsPath
@@ -9,6 +9,7 @@ classdef DirTools
     methods
         function pth = get.itsPath(this)
             pth = cellfun(@(t) t.itsPath, this.dirTools_, 'UniformOutput', false);
+            pth = unique(pth);
         end
         function list = get.itsListing(this)            
             ca = cellfun(@(t) t.itsListing, this.dirTools_, 'UniformOutput', false);
@@ -16,7 +17,7 @@ classdef DirTools
             for c = 1:length(ca)
                 sa = ca{c};
                 for s = 1:length(sa)
-                    list = [list sa(s)]; %#ok<AGROW>
+                    list = [list; sa(s)]; %#ok<AGROW>
                 end
             end
         end
@@ -32,24 +33,8 @@ classdef DirTools
             if (exist('idx','var'))
                 sarr = sarr(idx); end
         end
-        function sarr = invisibleFiles2sa(this, idx)
-            sarr = arrayfun(@(t) t.invisibleFiles2sa, this.dirTools_, 'UniformOutput', false);
-            if (exist('idx','var'))
-                sarr = sarr(idx); end
-        end
-        function sarr = invisibleDirectories2sa(this, idx)  
-            sarr = arrayfun(@(t) t.invisibleDirectories2sa, this.dirTools_, 'UniformOutput', false);
-            if (exist('idx','var'))
-                sarr = sarr(idx); end      
-        end
         
         %% return concatenated cell-arrays
-        function pp = paths(this, idx)
-            pp = cellfun(@(t) t.paths, this.dirTools_, 'UniformOutput', false);
-            pp = [pp{:}];
-            if (exist('idx','var'))
-                pp = pp{idx}; end
-        end
         function ff = fqfns(this, idx)
             ff = cellfun(@(t) t.fqfns, this.dirTools_, 'UniformOutput', false);
             ff = [ff{:}];
@@ -61,6 +46,7 @@ classdef DirTools
             ff = [ff{:}];
             if (exist('idx','var'))
                 ff = ff{idx}; end
+            
         end
         function ff = fqdns(this, idx)
             ff = cellfun(@(t) t.fqdns, this.dirTools_, 'UniformOutput', false);
@@ -82,39 +68,30 @@ classdef DirTools
         end
         
         function this = DirTools(varargin)
-            args = ensureCell(varargin);
-            this.dirTools_ = cell(size(args));
-            for v = 1:length(args)
-                this.dirTools_{v} = mlsystem.DirTool(args{v}); end
+ 			%% DirTools
+ 			%  Usage:  expects 0+ string arguments or cell arguments compatible with dir
+            
+            import mlsystem.*;
+            if (0 == nargin)
+                this.dirTools_ = {DirTool};
+            end
+            for v = 1:length(varargin)
+                if (iscell(varargin{v}))
+                    cargin = varargin{v};
+                    for c = 1:length(cargin)
+                        this.dirTools_ = [this.dirTools_ {DirTool(cargin{c})}];
+                    end
+                else                    
+                    this.dirTools_ = [this.dirTools_ {DirTool(varargin{v})}];
+                end
+            end
         end
     end    
     
     %% PRIVATE
     
     properties (Access = 'private')
-        dirTools_
-    end
-    
-    methods (Access = 'private')
-        function pth = commonPath(this)
-            sorted = this.sortLengths(this.fqdns);
-            for s = 1:length(sorted)-1
-                idx = strfind(sorted{s+1}, sorted{s});
-                if (0 == idx)
-                    pth = ''; return; end
-                if (1 == idx)
-                    pth = sorted{s+1}(1); return; end
-                sorted{s+1} = sorted{s+1}(1:idx);
-            end
-            pth = sorted{length(sorted)};
-        end
-        function ca = sortLengths(~, ca0)
-            ca = cell(size(ca0));
-            calens = cellfun(@length, ca0);
-            for c = 1:length(calens)
-                ca{calens{c}} = ca0{c};
-            end
-        end
+        dirTools_ = {}
     end
 end
 

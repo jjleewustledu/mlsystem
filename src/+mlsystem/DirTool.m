@@ -1,5 +1,5 @@
 classdef DirTool
-	%% DIRTOOL decorates the struct arrays available for built-in function dir
+	%% DIRTOOL extends functionality of dir.
     %  See also:  dir
     
     %  Version $Revision: 2467 $ was created $Date: 2013-08-10 21:27:41 -0500 (Sat, 10 Aug 2013) $ by $Author: jjlee $,
@@ -12,6 +12,15 @@ classdef DirTool
         itsPath
         itsListing
     end
+    
+    methods %% GET
+        function pth = get.itsPath(this)
+            pth = this.itsPath_;
+        end
+        function lst = get.itsListing(this)
+            lst = this.itsListing_;
+        end
+    end
 
     methods (Static)
         
@@ -19,7 +28,7 @@ classdef DirTool
         function [S,R] = rm(ca, flags)
             import mlsystem.*;
             if (~exist('flags','var'));    flags  = ''; end
-            if (DirTool.hasflags(ca)); [ca,flags] = DirTool.swap(ca, flags); end     
+            if (DirTool.hasflags__(ca)); [ca,flags] = DirTool.swap__(ca, flags); end     
             ca = ensureCell(ca);
             try
                 [S,R] = cellfun(@(x) mlbash(['rm ' flags ' ' x]),          ca, 'UniformOutput', false);
@@ -30,8 +39,8 @@ classdef DirTool
         function [S,R] = cp(ca, dest, flags)
             import mlsystem.*;    
             if (~exist('flags','var'));        flags  = ''; end        
-            if (DirTool.hasflags(ca));   [ca,  flags] = DirTool.swap(ca,   flags); end  
-            if (DirTool.hasflags(dest)); [dest,flags] = DirTool.swap(dest, flags); end 
+            if (DirTool.hasflags__(ca));   [ca,  flags] = DirTool.swap__(ca,   flags); end  
+            if (DirTool.hasflags__(dest)); [dest,flags] = DirTool.swap__(dest, flags); end 
             ca = ensureCell(ca);
             try
                 [S,R] = cellfun(@(x) mlbash(['cp ' flags ' ' x ' ' dest]), ca, 'UniformOutput', false);
@@ -42,8 +51,8 @@ classdef DirTool
         function [S,R] = mv(ca, dest, flags)
             import mlsystem.*;
             if (~exist('flags','var'));        flags  = ''; end
-            if (DirTool.hasflags(ca));   [ca,  flags] = DirTool.swap(ca,   flags); end  
-            if (DirTool.hasflags(dest)); [dest,flags] = DirTool.swap(dest, flags); end 
+            if (DirTool.hasflags__(ca));   [ca,  flags] = DirTool.swap__(ca,   flags); end  
+            if (DirTool.hasflags__(dest)); [dest,flags] = DirTool.swap__(dest, flags); end 
             ca = ensureCell(ca);
             try
                 [S,R] = cellfun(@(x) mlbash(['mv ' flags ' ' x ' ' dest]), ca, 'UniformOutput', false);
@@ -54,55 +63,25 @@ classdef DirTool
     end
     
 	methods 
-        function pth  = get.itsPath(this)
-            tokpth = strtok(this.itsPath, '*');
-            if (lexist(tokpth))
-                pth = tokpth;
-            else
-                pth = fileparts(tokpth);
-            end
-        end
         
-        % return struct-arrays
+        %% return struct-arrays
         function sarr = files2sa(this, idx)
-            sarr = this.pathDecoration( ...
-                   this.itsListing(~this.isdir & ~this.invisible));
+            sarr = this.includePath__( ...
+                   this.itsListing_(~this.isdir__ & ~this.invisible__));
             if (exist('idx','var')); sarr = sarr(idx); end
         end
         function sarr = directories2sa(this, idx)
-            sarr = this.pathDecoration( ...
-                   this.itsListing( this.isdir & ~this.invisible));
-            if (exist('idx','var')); sarr = sarr(idx); end
-        end
-        function sarr = invisibleFiles2sa(this, idx)
-            sarr = this.pathDecoration( ...
-                   this.itsListing(~this.isdir &  this.invisible));
-            if (exist('idx','var')); sarr = sarr(idx); end
-        end
-        function sarr = invisibleDirectories2sa(this, idx)
-            sarr = this.pathDecoration( ...
-                   this.itsListing( this.isdir &  this.invisible));
+            sarr = this.includePath__( ...
+                   this.itsListing_( this.isdir__ & ~this.invisible__));
             if (exist('idx','var')); sarr = sarr(idx); end
         end
         
-        % return cell-arrays
-        function pp   = paths(this, idx)
-            sarr = this.files2sa;
-            pp   = cell(1,length(sarr));
-            for s = 1:length(sarr)
-                pp{s} = sarr(s).itsPath;
-            end
-            if (exist('idx','var'))
-                pp = pp{idx}; 
-            else
-                pp = ensureCell(pp);
-            end
-        end
+        %% return cell-arrays
         function ff   = fqfns(this, idx)
             sarr = this.files2sa;
             ff   = cell(1,length(sarr));
             for s = 1:length(ff)
-                ff{s} = mlsystem.DirTool.fqname(sarr(s));
+                ff{s} = mlsystem.DirTool.fqname__(sarr(s));
             end
             if (exist('idx','var'))
                 ff = ff{idx}; 
@@ -114,7 +93,7 @@ classdef DirTool
             sarr = this.files2sa;
             ff   = cell(1,length(sarr));
             for s = 1:length(ff)
-                ff{s} = mlsystem.DirTool.name(sarr(s));
+                ff{s} = mlsystem.DirTool.name__(sarr(s));
             end
             if (exist('idx','var'))
                 ff = ff{idx}; 
@@ -126,7 +105,7 @@ classdef DirTool
             sarr = this.directories2sa;
             ff   = cell(1,length(sarr));
             for s = 1:length(ff)
-                ff{s} = mlsystem.DirTool.fqname(sarr(s));
+                ff{s} = mlsystem.DirTool.fqname__(sarr(s));
             end
             if (exist('idx','var'))
                 ff = ff{idx}; 
@@ -138,7 +117,7 @@ classdef DirTool
             sarr = this.directories2sa;
             ff   = cell(1,length(sarr));
             for s = 1:length(ff)
-                ff{s} = mlsystem.DirTool.name(sarr(s));
+                ff{s} = mlsystem.DirTool.name__(sarr(s));
             end
             if (exist('idx','var'))
                 ff = ff{idx}; 
@@ -147,64 +126,107 @@ classdef DirTool
             end
         end
         function len  = length(this)
-            len = length(this.itsListing);
+            len = length(this.itsListing_);
         end
         
- 		function this = DirTool(str) 
+        %% ctor
+ 		function this = DirTool(varargin) 
  			%% DirTool 
- 			%  Usage:  expects string arguments identical to dir
+ 			%  Usage:  expects [0 1] string arguments required by dir            
             
-            assert(ischar(str));
-            this.itsListing = dir(str);
-            this.itsPath = fileparts(str);
-            if (isempty(this.itsPath))
-                this.itsPath = pwd; end
- 		end % DirTool (ctor) 
+            ip = inputParser;
+            addOptional(ip, 'name', pwd, @ischar);
+            parse(ip, varargin{:});
+            
+            this.name_ = ip.Results.name;
+            this.itsListing_ = dir(this.name_);
+            this.pwd_ = pwd;
+            this.itsPath_ = this.setItsPath__;
+ 		end 
     end 
     
     %% PRIVATE
     
-    methods (Access = 'private', Static)        
-        function tf    = hasflags(obj)
+    properties %(Access = private)
+        itsListing_
+        itsPath_
+        name_
+        pwd_
+    end
+    
+    methods (Access = 'private', Static)
+        function tf    = hasflags__(obj)
             if (ischar(obj) && strncmp('-', obj, 1))
                 tf = true;
             else
                 tf = false;
             end
         end
-        function [a,b] = swap(a, b)
+        function [a,b] = swap__(a, b)
             tmp = a;
             a   = b;
             b   = tmp;
         end
-        function ff    = fqname(strct)
-            ff = fullfile(strct.itsPath, strct.name, '');
+        function ff    = fqname__(strct)
+            ff = fullfile(strct.itsPath, strct.name);
         end
-        function ff    = name(strct)
+        function ff    = name__(strct)
             ff = strct.name;
+        end
+        function pth  = trimTerminalFilesep__(pth)
+            if (strcmp(pth(end), filesep))
+                pth = pth(1:end-1);
+            end
         end
     end
     
-    methods (Access = 'private')        
-        function z    = zerosVec(this)
-            z = zeros(1,length(this.itsListing));
-        end
-        function tf   = isdir(this)
-            tf = this.zerosVec;
+    methods (Access = 'private')
+        function tf   = isdir__(this)
+            tf = this.zerosVec__;
             for z = 1:length(tf) %#ok<FORFLG>
-                tf(z) = this.itsListing(z).isdir; 
+                tf(z) = this.itsListing_(z).isdir; 
             end
         end
-        function tf   = invisible(this)
-            tf = this.zerosVec;
+        function tf   = invisible__(this)
+            tf = this.zerosVec__;
             for z = 1:length(tf) %#ok<FORFLG>
-                tf(z) = strncmp('.', this.itsListing(z).name, 1); 
+                tf(z) = strncmp('.', this.itsListing_(z).name, 1); 
             end
         end
-        function sarr = pathDecoration(this, sarr)
+        function sarr = includePath__(this, sarr)
             for s = 1:length(sarr) %#ok<FORFLG>
-                sarr(s).itsPath = this.itsPath; %#ok<PFBNS>
+                sarr(s).itsPath = this.itsPath_;
             end
+        end
+        function pth  = setItsPath__(this)            
+            pth = this.name_;
+            if (~strcmp(pth(1), filesep))
+                pth = fullfile(this.pwd_, pth);
+            end
+            if (isdir(pth))
+                pth = this.trimTerminalFilesep__(pth);
+                return
+            end
+            if (lstrfind(pth, '?'))
+                pth = strtok(pth, '?');
+                found = strfind(pth, filesep);
+                pth = pth(1:found(end)-1);
+                return
+            end
+            if (lstrfind(pth, '*'))
+                pth = strtok(pth, '*');
+                found = strfind(pth, filesep);
+                pth = pth(1:found(end)-1);
+                return
+            end            
+            if (this.length == 0)
+                pth = this.pwd_;
+                return
+            end
+            error('mlsystem:ioError', 'DirTool.setItsPath__');
+        end
+        function z    = zerosVec__(this)
+            z = zeros(1,length(this.itsListing_));
         end
     end
 
