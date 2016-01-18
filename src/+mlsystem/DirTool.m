@@ -1,4 +1,4 @@
-classdef DirTool < mlsystem.DirToolComponent
+classdef DirTool
 	%% DIRTOOL decorates the struct arrays available for built-in function dir
     %  See also:  dir
     

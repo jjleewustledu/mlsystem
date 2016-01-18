@@ -128,10 +128,10 @@ classdef FilesystemRegistry < mlpatterns.Singleton
                 error('mlsystem:IOError', '%s was empty', fqfn);
             end
         end % static textfileToCell
-        function cal  = textfileToCellArrayList(fqfn, eol)
+        function cal  = textfileToCellArrayList(varargin)
             cal = mlpatterns.CellArrayList;
             cal.add( ...
-                mlsystem.FilesystemRegistry.textfileToCell(fqfn, eol));
+                mlsystem.FilesystemRegistry.textfileToCell(varargin{:}));
         end
         function tf   = textfileStrcmp(fqfn, str)
             ca = mlsystem.FilesystemRegistry.textfileToCell(fqfn, true);

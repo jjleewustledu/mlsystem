@@ -1,4 +1,4 @@
-classdef DirTools < mlsystem.DirToolComponent
+classdef DirTools
     %% DIRTOOLS is the composite of mlsystem.DirTool, both of which form a composite design pattern with mlsystem.DirToolComponent
     
     properties
