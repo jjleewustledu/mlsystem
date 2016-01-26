@@ -64,7 +64,7 @@ classdef Test_DirTools < matlab.unittest.TestCase
 
  	methods (TestClassSetup)
 		function setupDirTools(this)
-            this.registry = mlfourd.UnittestRegistry.instance;
+            this.registry = mlfourd.UnittestRegistry.instance('initialize');
             this.registry.sessionFolder = 'mm01-020_p7377_2009feb5';
             cd(fullfile(this.registry.sessionPath, ''));
             this.pwd_ = pwd;
