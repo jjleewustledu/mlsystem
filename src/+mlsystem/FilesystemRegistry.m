@@ -46,7 +46,7 @@ classdef FilesystemRegistry < mlpatterns.Singleton
             
             iter = ip.Results.cal.createIterator;
             try
-                fid = fopen(ip.Results.fqfn, 'a+');
+                fid = fopen(ip.Results.fqfn, ip.Results.perm);
                 while (iter.hasNext)
                     fprintf(fid, '%s\n', char(iter.next));
                 end
