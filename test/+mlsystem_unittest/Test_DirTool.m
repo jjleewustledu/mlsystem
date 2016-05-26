@@ -76,21 +76,21 @@ classdef Test_DirTool < matlab.unittest.TestCase
             dt = mlsystem.DirTool('p7377tr1_frames');
             this.verifyTrue(isempty(dt.fqdns));
             this.verifyEqual(dt.fqfns{1}, ...
-                '/Volumes/InnominateHD3/Local/test/cvl/np755/mm01-020_p7377_2009feb5/ECAT_EXACT/pet/p7377tr1_frames/p7377tr1.img.rec');
+                fullfile(getenv('UNITTESTS'), 'cvl/np755/mm01-020_p7377_2009feb5/ECAT_EXACT/pet/p7377tr1_frames/p7377tr1.img.rec'));
         end
         function test_fqfns(this)
             dt = mlsystem.DirTool('*.v');
             this.verifyEqual(length(dt.fqfns), 5);
             this.verifyEqual(dt.fqfns{1}, ...
-                '/Volumes/InnominateHD3/Local/test/cvl/np755/mm01-020_p7377_2009feb5/ECAT_EXACT/pet/p7377ho1.v');
+                fullfile(getenv('UNITTESTS'), 'cvl/np755/mm01-020_p7377_2009feb5/ECAT_EXACT/pet/p7377ho1.v'));
             this.verifyEqual(dt.fqfns{end}, ...
-                '/Volumes/InnominateHD3/Local/test/cvl/np755/mm01-020_p7377_2009feb5/ECAT_EXACT/pet/p7377tr1.v');
+                fullfile(getenv('UNITTESTS'), 'cvl/np755/mm01-020_p7377_2009feb5/ECAT_EXACT/pet/p7377tr1.v'));
         end
         function test_fqdns(this)
             dt = mlsystem.DirTool('..');
             this.verifyEqual(length(dt.fqdns), 4);
             this.verifyEqual(dt.fqdns{1}, ...
-                '/Volumes/InnominateHD3/Local/test/cvl/np755/mm01-020_p7377_2009feb5/ECAT_EXACT/pet/../962_4dfp');
+                fullfile(getenv('UNITTESTS'), 'cvl/np755/mm01-020_p7377_2009feb5/ECAT_EXACT/pet/../962_4dfp'));
         end
 	end
 

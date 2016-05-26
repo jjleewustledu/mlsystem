@@ -37,22 +37,22 @@ classdef Test_DirTools < matlab.unittest.TestCase
             
             dts = mlsystem.DirTools({'ECAT_EXACT' 'Trio'}, 'mri');            
             this.verifyEqual(dts.itsPath{1}, ...
-                '/Volumes/InnominateHD3/Local/test/cvl/np755/mm01-020_p7377_2009feb5/ECAT_EXACT');
+                fullfile(getenv('UNITTESTS'), 'cvl/np755/mm01-020_p7377_2009feb5/ECAT_EXACT'));
             this.verifyEqual(size(dts.itsListing), [82 1]);
         end
         function test_fqfns(this)
             dts = mlsystem.DirTools({'ECAT_EXACT' 'Trio'}, 'mri');
             this.verifyEqual(length(dts.fqfns), 60);
             this.verifyEqual(dts.fqfns{1}, ...
-                '/Volumes/InnominateHD3/Local/test/cvl/np755/mm01-020_p7377_2009feb5/mri/T1.mgz');
+                fullfile(getenv('UNITTESTS'), 'cvl/np755/mm01-020_p7377_2009feb5/mri/T1.mgz'));
             this.verifyEqual(dts.fqfns{end}, ...
-                '/Volumes/InnominateHD3/Local/test/cvl/np755/mm01-020_p7377_2009feb5/mri/xdebug_mris_calc');
+                fullfile(getenv('UNITTESTS'), 'cvl/np755/mm01-020_p7377_2009feb5/mri/xdebug_mris_calc'));
         end
         function test_fqdns(this)
             dts = mlsystem.DirTools({'ECAT_EXACT' 'Trio'}, 'mri');            
             this.verifyEqual(length(dts.fqdns), 11);
             this.verifyEqual(dts.fqdns{1}, ...
-                '/Volumes/InnominateHD3/Local/test/cvl/np755/mm01-020_p7377_2009feb5/ECAT_EXACT/962_4dfp');
+                fullfile(getenv('UNITTESTS'), 'cvl/np755/mm01-020_p7377_2009feb5/ECAT_EXACT/962_4dfp'));
         end
         function test_cd(this)            
             for d = 1:length(this.testObj.fqdns)-1
