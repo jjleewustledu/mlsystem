@@ -70,6 +70,8 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
     
     methods
         function startup(this)
+            if (isdeployed)
+                return; end
             this.setSrcPath();
             this.setTestPath();
             this.setMexPath();
