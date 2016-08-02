@@ -107,7 +107,7 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
             end
         end
         function setFslPath(this)
-            if (isempty(strfind(path, this.fslroot(1:end-1))))
+            if (isempty(strfind(path, this.fslroot(1:end-1))) && ~isempty(this.fslroot(1:end-1)))
                 path(fullfile(this.fslroot,  'etc/matlab'), path);
             end
         end
@@ -176,6 +176,7 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
                 case {'glnxa64' 'glnx86'}
                     this.llpenv =   'LD_LIBRARY_PATH';
                     this.dipos  = '/opt/dip/Linux/';
+                case 'win64'
                 otherwise
                     warning('mlsystem:NotImplemented', 'MatlabRegistry.ctor.computer() -> %s\n', computer('arch'));
             end
