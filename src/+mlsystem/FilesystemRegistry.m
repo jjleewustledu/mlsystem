@@ -6,6 +6,11 @@ classdef FilesystemRegistry < mlpatterns.Singleton
  	%  $Id: FilesystemRegistry.m 2642 2013-09-21 22:58:30Z jjlee $ 
  	%  N.B. classdef (Sealed, Hidden, InferiorClasses = {?class1,?class2}, ConstructOnLoad) 
 
+    
+    properties 
+        noclobber = false
+    end
+    
     methods (Static)
         
         function this = instance(varargin)
