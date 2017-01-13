@@ -152,7 +152,7 @@ classdef FilesystemRegistry < mlpatterns.Singleton
  		% N.B. (Static, Abstract, Access=', Hidden, Sealed) 
 
  		function this = FilesystemRegistry() 
- 			%% FILESYSTEMREGISTRY (ctor) is private to enforce instantiation through instance            
+ 			%% FILESYSTEMREGISTRY (ctor) is private to enforce instantiation through instance 
             this = this@mlpatterns.Singleton;
  		end % FilesystemRegistry (ctor) 
  	end 
