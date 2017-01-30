@@ -10,7 +10,39 @@ classdef VectorTools
  	%  $Id$ 
  	 
 	methods (Static)
-        function F = shiftTime(F, Dt)
+        function [times,f] = shiftVector(times, f, Dt)
+            import mlsystem.*
+            if (Dt > 0)
+                [times,f] = VectorTools.shiftVectorRight(times, f, Dt);
+                return
+            end
+            if (Dt < 0)
+                [times,f] = VectorTools.shiftVectorLeft( times, f, Dt);
+                return
+            end
+        end
+        function [times,f] = shiftVectorLeft(times0, f0, Dt)
+            %  Dt in sec
+            Dt     = abs(Dt);
+            idx_0  = floor(sum(double(times0 < Dt + times0(1)))+1);
+            times  = times0(idx_0:end);
+            times  = times - times(1);
+            f = f0(idx_0:end);
+            f = f - min(f);
+        end
+        function [times,f] = shiftVectorRight(times0, f0, Dt)
+            %  Dt in sec
+            Dt     = abs(Dt);
+            lenDt  = ceil(Dt/(times0(2) - times0(1)));
+            newLen = length(f0) + lenDt;
+            
+            times0 = times0 - times0(1) + Dt;
+            times  = [0:1:lenDt-1 times0];
+            f = f0(1) * ones(1,newLen);            
+            f(end-length(f0)+1:end) = f0;
+            f = f - min(f);
+        end
+        function f = shiftTime(f, Dt)
             %% SHIFTTIME shifts the time-indices of vector f(t) or the right-most indices of tensor F(a, b, c, t).
             %  Usage:  F = VectorTools.shiftTime(F, Delta_t, property, property_value);
             %          Delta_t > 0 shifts F later in time;
@@ -20,11 +52,11 @@ classdef VectorTools
             %                    false:           values revealed are the boundary value of F.   
             
             import mlsystem.*;
-            sizeF = size(F);
+            sizeF = size(f);
             if (length(sizeF) < 3 && (1 == sizeF(1) || 1 == sizeF(2)))
-                F = VectorTools.shiftVectorTime(F, Dt);
+                f = VectorTools.shiftVectorTime(f, Dt);
             else
-                F = VectorTools.shiftTensorTime(F, Dt);
+                f = VectorTools.shiftTensorTime(f, Dt);
             end
         end  
         function x = ensureColVector(x)
@@ -61,7 +93,7 @@ classdef VectorTools
                 f  = f1;
             end                
         end
-        function F = shiftTensorTime(F, Dt, varargin) %#ok<INUSD>
+        function f = shiftTensorTime(f, Dt, varargin) %#ok<INUSD>
             error('mlsystem:notImplemented', 'VectorTools.shiftTensorTime');
         end
     end
