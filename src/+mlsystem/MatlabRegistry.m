@@ -12,11 +12,11 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
     properties (Constant)
         MLPACKAGES = {  ...
             'dicm2nii' ...
-            'mlaif'       'mlan'       'mlanalysis'  'mlarbelaez'   'mlarchitect'  'mlaveraging' 'mlbayesian' 'mlcaster' ...
-            'mlct'        'mlchoosers' 'mlderdeyn'   'mldb'         'mldistcomp'   'mlentropy'   'mlfourd'    'mlfourdfp'  'mlfsl' ...
-            'mlio'        'mlkety'     'mlkinetics'  'mlmr'         'mlniftitools' 'mlnest'      'mlparallel' 'mlpatterns' ...
-            'mlperfusion' 'mlpet'      'mlpipeline'  'mlpowers'     'mlpublish'    'mlraichle'    'mlrois'      'mlsiemens' ...
-            'mlstep2cs'   'mlsurfer'   'mlsystem'    'mltvd'        'mlunpacking'  'mlusmle' ...
+            'mlaif'       'mlan'       'mlanalysis'  'mlarbelaez' 'mlarchitect'  'mlaveraging' 'mlbayesian' 'mlcaster' ...
+            'mlct'        'mlchoosers' 'mlderdeyn'   'mldb'       'mldistcomp'   'mlentropy'   'mlfourd'    'mlfourdfp'  'mlfsl' ...
+            'mlio'        'mlkety'     'mlkinetics'  'mlmr'       'mlniftitools' 'mlnest'      'mlparallel' 'mlpatterns' ...
+            'mlperfusion' 'mlpet'      'mlpipeline'  'mlpowers'   'mlpublish'    'mlraichle'   'mlrois'     'mlsiemens' ...
+            'mlstep2cs'   'mlsurfer'   'mlsystem'    'mltvd'      'mlunpacking'  'mlusmle'     'mlblazey' ...
             'mldata'} 
         MLV_SERIAL = '7_9'
         MIN_VERSION = '7.11.0'
@@ -32,6 +32,7 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
         matlabProcessManagerRoot
         matlabStanRoot
         mexroot
+        psisRoot
         srcroot
         randstream
         useDip    = false;
@@ -107,23 +108,17 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
             end
         end
         function setFslPath(this)
-            if (isempty(strfind(path, this.fslroot(1:end-1))) && ~isempty(this.fslroot(1:end-1)))
+            if (~contains(path, this.fslroot(1:end-1)) && ~isempty(this.fslroot(1:end-1)))
                 path(fullfile(this.fslroot,  'etc/matlab'), path);
             end
         end
         function setMexPath(this)
-            if (isempty(strfind(path, this.mexroot(1:end-1))))
+            if (~contains(path, this.mexroot(1:end-1)))
                 path(this.mexroot, path);
             end
         end
         function setSrcPath(this)
             assert(~verLessThan('matlab', this.MIN_VERSION));
-            for p = 1:length(this.MLPACKAGES) %#ok<*FORFLG>
-                srcPth = fullfile(this.srcroot, 'mlcvl', this.MLPACKAGES{p}, 'src');
-                if (isempty(strfind(path, srcPth)))
-                    path(srcPth, path);
-                end
-            end
             path([...
                 fullfile(this.srcroot, 'mlcvl/dicom_sort_convert/src') pathsep ...
                 fullfile(this.srcroot, 'mlcvl/dicom_spectrum/src') pathsep ...
@@ -136,20 +131,29 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
                 fullfile(this.srcroot, 'mlcvl/xml_io_tools') ...
                 ], path);
                 %fullfile(this.srcroot, 'mlcvl/mlniftitools/global') pathsep ...
+            for p = 1:length(this.MLPACKAGES) %#ok<*FORFLG>
+                srcPth = fullfile(this.srcroot, 'mlcvl', this.MLPACKAGES{p}, 'src');
+                if (~contains(path, srcPth))
+                    path(srcPth, path);
+                end
+            end
         end
         function setStanPath(this)
-            if (isempty(strfind(path, this.matlabProcessManagerRoot(1:end-1))))
+            if (~contains(path, this.matlabProcessManagerRoot(1:end-1)))
                 path(this.matlabProcessManagerRoot, path);
             end
-            if (isempty(strfind(path, this.matlabStanRoot(1:end-1))))
+            if (~contains(path, this.matlabStanRoot(1:end-1)))
                 path(this.matlabStanRoot, path);
+            end
+            if (~contains(path, this.psisRoot(1:end-1)))
+                path(this.psisRoot, path);
             end
         end
         function setTestPath(this)
             assert(~verLessThan('matlab', this.MIN_VERSION));
             for p = 1:length(this.MLPACKAGES) %#ok<*FORFLG>    
                 testPth = fullfile(this.srcroot, 'mlcvl', this.MLPACKAGES{p}, 'test');
-                if (isempty(strfind(path, testPth)))
+                if (~contains(path, testPth))
                     path(testPth, path);
                 end
             end
@@ -184,8 +188,9 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
             this.homeroot                 = [getenv('HOME') '/'];
             this.mexroot                  = fullfile(this.homeroot, 'Local/mex/');
             this.srcroot                  = fullfile(this.homeroot, 'Local/src/');
-            this.matlabProcessManagerRoot = fullfile(this.srcroot,  'MatlabProcessManager/');
-            this.matlabStanRoot           = fullfile(this.srcroot,  'MatlabStan/');
+            this.matlabProcessManagerRoot = fullfile(this.srcroot,  'mlcvl/MatlabProcessManager/');
+            this.matlabStanRoot           = fullfile(this.srcroot,  'mlcvl/MatlabStan-2.15.1.0/');
+            this.psisRoot                 = fullfile(this.srcroot,  'mlcvl/MatlabStan-2.15.1.0/psis/');
         end
     end
 end

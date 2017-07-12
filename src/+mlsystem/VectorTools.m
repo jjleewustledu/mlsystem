@@ -14,17 +14,25 @@ classdef VectorTools
     end
  	 
 	methods (Static)
-        function x = ensureColVector(x)
+        function [x,flipped] = ensureColVector(x)
             %% ENSURECOLVECTOR reshapes row vectors to col vectors, leaving matrices untouched
             
+            flipped = false;
             if (numel(x) > length(x)); return; end
-            if (size(x,2) > size(x,1)); x = x'; end
+            if (size(x,2) > size(x,1))
+                x = x'; 
+                flipped = true;
+            end
         end
-        function x = ensureRowVector(x)
+        function [x,flipped] = ensureRowVector(x)
             %% ENSUREROWVECTOR reshapes row vectors to col vectors, leaving matrices untouched
             
+            flipped = false;
             if (numel(x) > length(x)); return; end
-            if (size(x,1) > size(x,2)); x = x'; end
+            if (size(x,1) > size(x,2))
+                x = x';
+                flipped = true;
+            end
         end       
     end 
     
