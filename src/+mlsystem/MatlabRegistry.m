@@ -189,9 +189,9 @@ classdef (Sealed) MatlabRegistry < mlsystem.MatlabSingleton
             this.homeroot                 = [getenv('HOME') '/'];
             this.mexroot                  = fullfile(this.homeroot, 'Local/mex/');
             this.srcroot                  = fullfile(this.homeroot, 'Local/src/');
-            this.matlabProcessManagerRoot = fullfile(this.srcroot,  'mlcvl/MatlabProcessManager/');
-            this.matlabStanRoot           = fullfile(this.srcroot,  'mlcvl/MatlabStan-2.15.1.0/');
-            this.psisRoot                 = fullfile(this.srcroot,  'mlcvl/MatlabStan-2.15.1.0/psis/');
+            this.matlabProcessManagerRoot = fullfile(this.srcroot,  'MatlabProcessManager/');
+            this.matlabStanRoot           = fullfile(this.srcroot,  'MatlabStan/');
+            this.psisRoot                 = fullfile(this.srcroot,  'MatlabStan/psis/');
         end
     end
 end
