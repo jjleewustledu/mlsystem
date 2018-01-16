@@ -44,9 +44,9 @@ classdef FilesystemRegistry < mlpatterns.Singleton
         end
         function        cellArrayListToTextfile(varargin)
             ip = inputParser;
-            addRequired(ip, 'cal',        @(x) isa(x, 'mlpatterns.CellArrayList'));
-            addRequired(ip, 'fqfn',       @ischar);
-            addOptional(ip, 'perm', 'a+', @ischar);
+            addRequired(ip, 'cal',       @(x) isa(x, 'mlpatterns.CellArrayList'));
+            addRequired(ip, 'fqfn',      @ischar);
+            addOptional(ip, 'perm', 'w', @ischar);
             parse(ip, varargin{:});
             
             iter = ip.Results.cal.createIterator;
