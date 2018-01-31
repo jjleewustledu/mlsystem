@@ -26,7 +26,7 @@ classdef Test_NewClassStrategyResult
 	methods (TestClassSetup) 
 		function addPathAndData(this) 
 			this.testData.origPath = pwd;
-			this.testData.workPath = fullfile('/Users/jjlee/Local/src/mlcvl/mlsystem/test/+mlsystem_unittest');
+			this.testData.workPath = fullfile('/Users/jjlee/MATLAB-Drive/mlsystem/test/+mlsystem_unittest');
 			cd(this.testData.workPath); 
 		end 
 	end 

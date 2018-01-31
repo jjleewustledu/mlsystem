@@ -117,7 +117,7 @@ classdef Newcl
     
     methods %% GET
         function p = get.packageHome(this) %#ok<MANU>
-            p = fullfile(getenv('HOME'), 'Local/src/mlcvl', '');
+            p = fullfile(getenv('HOME'), 'MATLAB-Drive', '');
         end
         function v = get.verbose(this) %#ok<MANU>
             v = ~isempty(getenv('VERBOSE'));
@@ -253,22 +253,27 @@ classdef Newcl
             this.classNotes = this.topClassNotes(this.ctorHints);            
             this.propsig = ...
                 sprintf('\t%s\n \t\t%s\n \t%s\n\n', ...
-                'properties', this.propertyHints, 'end'); 
-            cinfo = this.classInfo;
-            ctorsig = ...
-                sprintf( ...
+                'properties', this.propertyHints, 'end');     
+            this.methsig = ...
+                sprintf('\tmethods \n\t\t %s \n %s \tend \n\n', ...
+                this.methodHints, this.ctorSig);
+            this.privatePropsig = '';
+            this.privateMethsig = '';            
+            status = this.writecl;
+        end
+        function str       = ctorSig(this)
+            if (strcmp(this.classInfo.name(1), 'I'))
+                str = '';
+                return
+            end 
+            cinfo = this.classInfo; 
+            str = sprintf( ...
                 '\t\t%s %s\n \t\t\t%s %s\n \t\t\t%s %s\n\n \t\t\t%s\n \t\t%s\n', ...
                 'function', ['this = ' cinfo.name '(varargin)'], ...
                 '%%', upper(cinfo.name), ...
                 '% ', cinfo.ctorUsage, ...
-                Newcl.funInheritance(cinfo), 'end');            
-            this.methsig = ...
-                sprintf('\tmethods \n\t\t %s \n %s \tend \n\n', ...
-                this.methodHints, ctorsig);
-            this.privatePropsig = '';
-            this.privateMethsig = '';
-            
-            status = this.writecl(cinfo);
+                mlsystem.Newcl.funInheritance(cinfo), 'end');           
+            return
         end
         function str       = ctorHints(this)
             str = '';
@@ -333,7 +338,7 @@ classdef Newcl
                 sprintf('\t%s\n%s\t%s\n\n', ...
                 'methods (Access = private)', privateFunsig, 'end');
             
-            status = this.writecl(cinfo);
+            status = this.writecl;
         end 
         function str       = preamble(this)
             cinfo = this.classInfo;
@@ -358,8 +363,8 @@ classdef Newcl
             str = sprintf('\t%s\n end\n\n', ...
                 '%  Created with Newcl by John J. Lee after newfcn by Frank Gonzalez-Morphy');
         end
-        function status    = writecl(this, cinfo)
-            fqfn   = fullfile(cinfo.fqpath, [cinfo.name this.EXT]);
+        function status    = writecl(this)
+            fqfn   = fullfile(this.classInfo.fqpath, [this.classInfo.name this.EXT]);
             fid    = fopen(fqfn,'w');
             fprintf( fid, '%s%s%s%s%s%s%s%s', ...
                      this.preamble,       this.classNotes, ...

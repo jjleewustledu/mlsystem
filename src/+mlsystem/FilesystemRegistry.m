@@ -73,7 +73,7 @@ classdef FilesystemRegistry < mlpatterns.Singleton
                 pth     = pth(1:indices(1)-1);
                 fprintf('truncating pth to %s', pth);
             end
-            pth = ensureFolderExists(fullfile(pth, fld, ''));
+            pth = ensuredir(fullfile(pth, fld, ''));
         end % static composePath
         function s    = extractNestedFolders(pth, patt)
             %% EXTRACTNESTEDFOLDERS finds folders with string-pattern in the specified filesystem path
@@ -98,7 +98,7 @@ classdef FilesystemRegistry < mlpatterns.Singleton
             %  It makes targetfold as needed, handles exceptions as needed and displays messages to console
             %  Usage:  cwd = FilesystemRegistry.cd(targetfold)
             try
-                targetfold = ensureFolderExists(targetfold);
+                targetfold = ensuredir(targetfold);
                 try
                     cwd = cd(targetfold); %#ok<MCCD>
                     warning('mlsystem:IO', 'FilesystemRegistry.scd changed dir to %s\n', cwd);
