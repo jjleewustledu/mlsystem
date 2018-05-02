@@ -242,9 +242,10 @@ classdef Newcl
             end
             assert(ischar(clsummary));
         end
-        function ctorusage = queryctorusage(~, cinfo, ctorusage)
+        function ctorusage = queryctorusage(~, ~, ctorusage)
             if (isempty(ctorusage))
-                ctorusage = sprintf('Usage:  this = %s()', cinfo.name); end
+                ctorusage = '@param .'; 
+            end
         end
         function status    = assemblecl(this)
             % ASSEMBLECL
