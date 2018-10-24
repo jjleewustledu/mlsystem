@@ -167,11 +167,14 @@ classdef Newcl
                 strng = '';
             end
         end
-        function strng = funInheritance(cinfo)
+        function strng = funInheritance(cinfo)            
             assert(isstruct(cinfo));
             if (isfield(cinfo, 'subname'))
                 if (iscell(cinfo.subname))
                     parent = cinfo.subname{1};
+                    if (strcmp(parent, 'handle'))
+                        parent = cinfo.subname{2};
+                    end
                 else
                     parent = cinfo.subname;
                 end
