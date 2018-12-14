@@ -19,7 +19,7 @@ classdef Test_DirTool < matlab.unittest.TestCase
  	end
 
 	methods (Test)
-         function test_name_(this)
+        function test_name_(this)
             import mlsystem.*;
 %            dt = DirTool('/');
 %            this.verifyEqual(dt.itsPath, '/');
