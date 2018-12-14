@@ -66,13 +66,15 @@ classdef DirTool
         
         %% return struct-arrays
         function sarr = files2sa(this, idx)
-            sarr = this.includePath__( ...
-                   this.itsListing_(~this.isdir__ & ~this.invisible__));
+            list = this.itsListing_(~this.isdir__ & ~this.invisible__);
+            if (isempty(list)); sarr = []; return; end
+            sarr = this.includePath__(list);
             if (exist('idx','var')); sarr = sarr(idx); end
         end
         function sarr = directories2sa(this, idx)
-            sarr = this.includePath__( ...
-                   this.itsListing_( this.isdir__ & ~this.invisible__));
+            list = this.itsListing_( this.isdir__ & ~this.invisible__);
+            if (isempty(list)); sarr = []; return; end
+            sarr = this.includePath__(list);
             if (exist('idx','var')); sarr = sarr(idx); end
         end
         
@@ -219,7 +221,7 @@ classdef DirTool
                 pth = pth(1:found(end)-1);
                 return
             end            
-            if (this.length == 0)
+            if (0 == this.length || 1 == this.length)
                 pth = this.pwd_;
                 return
             end

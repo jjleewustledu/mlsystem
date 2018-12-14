@@ -11,7 +11,7 @@ classdef DirTools
             pth = cellfun(@(t) t.itsPath, this.dirTools_, 'UniformOutput', false);
             pth = unique(pth);
         end
-        function list = get.itsListing(this)            
+        function list = get.itsListing(this)
             ca = cellfun(@(t) t.itsListing, this.dirTools_, 'UniformOutput', false);
             list = struct([]);
             for c = 1:length(ca)
