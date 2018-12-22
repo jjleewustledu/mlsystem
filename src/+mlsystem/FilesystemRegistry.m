@@ -1,4 +1,4 @@
-classdef FilesystemRegistry < mlpatterns.Singleton
+classdef FilesystemRegistry < handle
 	%% FILESYSTEMREGISTRY is a singleton providing filesystem utilities	 
 	%  Version $Revision: 2642 $ was created $Date: 2013-09-21 17:58:30 -0500 (Sat, 21 Sep 2013) $ by $Author: jjlee $,  
  	%  last modified $LastChangedDate: 2013-09-21 17:58:30 -0500 (Sat, 21 Sep 2013) $ and checked into svn repository $URL: file:///Users/jjlee/Library/SVNRepository_2012sep1/mpackages/mlfourd/src/+mlfourd/trunk/FilesystemRegistry.m $ 
@@ -153,7 +153,6 @@ classdef FilesystemRegistry < mlpatterns.Singleton
 
  		function this = FilesystemRegistry() 
  			%% FILESYSTEMREGISTRY (ctor) is private to enforce instantiation through instance 
-            this = this@mlpatterns.Singleton;
  		end % FilesystemRegistry (ctor) 
  	end 
 
