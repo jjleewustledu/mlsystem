@@ -110,8 +110,8 @@ classdef AbstractNewcl < mlsystem.NewclInterface
         function this = set.packageName(this, n)
             this.packageName_ = char(n);
            if (~lexist(fullfile(this.packageHome, n, '')))
-               fprintf('\nREMINDER:  please add %s to mlsystem.MatlabRegistry\n\n', n);
-               edit(fullfile(this.packageHome, 'mlsystem', 'src', '+mlsystem', 'MatlabRegistry.m'));
+               fprintf('\nREMINDER:  please add %s to MatlabRegistry\n\n', n);
+               edit(fullfile(getenv('HOME'), 'Documents', 'MATLAB', 'MatlabRegistry.m'));
            end
         end
         function n    = get.packageName(this)
