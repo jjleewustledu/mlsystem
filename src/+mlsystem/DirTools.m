@@ -79,7 +79,7 @@ classdef DirTools
                 if (iscell(varargin{v}))
                     cargin = varargin{v};
                     for c = 1:length(cargin)
-                        this.dirTools_ = [this.dirTools_ {DirTool(cargin{c})}];
+                        this.dirTools_ = [this.dirTools_ {DirTool(ensureChar(cargin{c}))}];
                     end
                 else                    
                     this.dirTools_ = [this.dirTools_ {DirTool(varargin{v})}];
