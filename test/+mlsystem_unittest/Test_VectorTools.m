@@ -25,12 +25,14 @@ classdef Test_VectorTools < matlab.unittest.TestCase
  			this.assertEqual(1,1);
         end
         function test_vec0(this)
+            figure
             plot(this.vec0);
             title('Test_VectorTools.vec0');
         end
         function test_shiftVector(this)
+            figure
             [t,f] = this.testObj.shiftVector(this.times0, this.vec0, 5);
-            plot(this.times0, this.vec0, t, f);
+            plot(this.times0, this.vec0, t, f, ':o');
             title('shift Dt = 5');
             legend('vec0(times0)', '[t,f] = shiftVector');
             this.verifyEqual(length(t), 25);
@@ -38,7 +40,7 @@ classdef Test_VectorTools < matlab.unittest.TestCase
             
             figure;
             [t,f] = this.testObj.shiftVector(this.times0, this.vec0, -5);
-            plot(this.times0, this.vec0, t, f);
+            plot(this.times0, this.vec0, t, f, ':o');
             title('shift Dt = -5');
             legend('vec0(times0)', '[t,f] = shiftVector');
             this.verifyEqual(length(t), 15);
@@ -46,11 +48,39 @@ classdef Test_VectorTools < matlab.unittest.TestCase
             
             figure;
             [t,f] = this.testObj.shiftVector(this.times0, this.vec0, -10);
-            plot(this.times0, this.vec0, t, f);
+            plot(this.times0, this.vec0, t, f, ':o');
             title('shift Dt = -10');
             legend('vec0(times0)', '[t,f] = shiftVector');
             this.verifyEqual(length(t), 10);
             this.verifyEqual(length(f), 10);
+        end
+        function test_shiftVectorNumeric(this)
+            t = [0 1 3 7 15 31];
+            f = 2*t;
+            [a,b] = shiftVector(t, f, 0);
+            this.verifyEqual(a, [0     1     3     7    15    31])
+            this.verifyEqual(b, [0     2     6    14    30    62])
+            [a,b] = shiftVector(t, f, 1);
+            this.verifyEqual(a, [0     1     2     4     8    16    32])
+            this.verifyEqual(b, [0     0     2     6    14    30    62])           
+            [a,b] = shiftVector(t, f, 2);
+            this.verifyEqual(a, [0     1     2     4     8    16    32])
+            this.verifyEqual(b, [0     0     2     6    14    30    62])              
+            [a,b] = shiftVector(t, f, 3);
+            this.verifyEqual(a, [0     1     3     4     6    10    18    34])
+            this.verifyEqual(b, [0     0     0     2     6    14    30    62])              
+            [a,b] = shiftVector(t, f, 7);
+            this.verifyEqual(a, [0     1     3     7     8    10    14    22    38])
+            this.verifyEqual(b, [0     0     0     0     2     6    14    30    62])              
+            [a,b] = shiftVector(t, f, -1);
+            this.verifyEqual(a, [0     2     6    14    30])
+            this.verifyEqual(b, [2     6    14    30    62])              
+            [a,b] = shiftVector(t, f, -3);
+            this.verifyEqual(a, [0     4    12    28])
+            this.verifyEqual(b, [6    14    30    62])              
+            [a,b] = shiftVector(t, f, -7);
+            this.verifyEqual(a, [0     8    24])
+            this.verifyEqual(b, [14    30    62])              
         end
 	end
 

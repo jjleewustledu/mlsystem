@@ -22,6 +22,42 @@ classdef Test_TensorTools < matlab.unittest.TestCase
  			this.verifyEqual(1,1);
  			this.assertEqual(1,1);
  		end
+        function test_shiftTensorNumeric(this)
+            t = [0 1 3 7 15 31];
+            f = mlfourd.ImagingFormatContext( ...
+                fullfile(MatlabRegistry.instance().srcroot, 'mlfourd', 'data', 'T1.nii.gz'));
+            f.fileprefix = 'Test_TensorTools_test_shiftTensorNumeric';
+            f.datatype = 64;
+            f.img = repmat(f.img, [1 1 1 6]);
+            for ti = 1:6
+                f.img(:,:,:,ti) = f.img(:,:,:,ti)*2*t(ti)/dipmax(f.img);
+            end
+            
+            [a,b] = shiftTensor(t, f.img, 0);
+            this.verifyEqual( a, [0     1     3     7    15    31])
+            this.verifyEqualb(b, [0     2     6    14    30    62])
+            [a,b] = shiftTensor(t, f.img, 1);
+            this.verifyEqual( a, [0     1     2     4     8    16    32])
+            this.verifyEqualb(b, [0     0     2     6    14    30    62])           
+            [a,b] = shiftTensor(t, f.img, 2);
+            this.verifyEqual( a, [0     1     2     4     8    16    32])
+            this.verifyEqualb(b, [0     0     2     6    14    30    62])              
+            [a,b] = shiftTensor(t, f.img, 3);
+            this.verifyEqual( a, [0     1     3     4     6    10    18    34])
+            this.verifyEqualb(b, [0     0     0     2     6    14    30    62])              
+            [a,b] = shiftTensor(t, f.img, 7);
+            this.verifyEqual( a, [0     1     3     7     8    10    14    22    38])
+            this.verifyEqualb(b, [0     0     0     0     2     6    14    30    62])              
+            [a,b] = shiftTensor(t, f.img, -1);
+            this.verifyEqual( a, [0     2     6    14    30])
+            this.verifyEqualb(b, [2     6    14    30    62])              
+            [a,b] = shiftTensor(t, f.img, -3);
+            this.verifyEqual( a, [0     4    12    28])
+            this.verifyEqualb(b, [6    14    30    62])              
+            [a,b] = shiftTensor(t, f.img, -7);
+            this.verifyEqual( a, [0     8    24])
+            this.verifyEqualb(b, [14    30    62])              
+        end
 	end
 
  	methods (TestClassSetup)
@@ -44,7 +80,12 @@ classdef Test_TensorTools < matlab.unittest.TestCase
 
 	methods (Access = private)
 		function cleanTestMethod(this)
- 		end
+        end
+        function verifyEqualb(this, b, expected)
+            for ie = 1:length(expected)
+                this.verifyEqual(dipmax(b(:,:,:,ie)), expected(ie))
+            end
+        end
 	end
 
 	%  Created with Newcl by John J. Lee after newfcn by Frank Gonzalez-Morphy
