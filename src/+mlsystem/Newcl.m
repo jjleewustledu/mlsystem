@@ -364,7 +364,7 @@ classdef Newcl
                 ip.Results.classHints);  
         end
         function str       = closing(~)
-            str = sprintf('\t%s\n end\n\n', ...
+            str = sprintf('\t%s\nend\n\n', ...
                 '%  Created with Newcl by John J. Lee after newfcn by Frank Gonzalez-Morphy');
         end
         function status    = writecl(this)
