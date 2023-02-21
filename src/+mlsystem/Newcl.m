@@ -14,10 +14,10 @@ classdef Newcl
         EXT = '.m'
         inspiration = "%  Created with mlsystem.Newcl, inspired by Frank Gonzalez-Morphy's newfcn."
         ip = ["ip = inputParser;"; ...
-              "addRequired(ip, ""p1"", @(x))"; ...
-              "addOptional(ip, ""p2"", [], @(x))"; ...
-              "addParameter(ip, ""p3"", [], @(x))"; ...
-              "parse(ip, varargin{:})"; ...
+              "addRequired(ip, ""p1"", @(x));"; ...
+              "addOptional(ip, ""p2"", [], @(x));"; ...
+              "addParameter(ip, ""p3"", [], @(x));"; ...
+              "parse(ip, varargin{:});"; ...
               "ipr = ip.Results;"]
         Returns = "returned_name: Description of returned."
     end
@@ -233,7 +233,7 @@ classdef Newcl
                 ss = ss(~contains(ss, 'handle') & ~contains(ss, "matlab"));
                 super = ss(1);
                 if strlength(super) > 0
-                    this_super = "this = this@" + super + "(varargin{:})";
+                    this_super = "this = this@" + super + "(varargin{:});";
                 else
                     this_super = "";
                 end
@@ -290,7 +290,7 @@ classdef Newcl
             %                 Default := "varargin".
             %      Args (text): parameter specifying doc-string "arg_name (arg_class):  Description of arg."
             %                   Default := "".
-            %      this_super (text): parameter, e.g., "this = this@mlsystem.SuperClass(v1, v2, varargin{:})".
+            %      this_super (text): parameter, e.g., "this = this@mlsystem.SuperClass(v1, v2, varargin{:});".
             %                         Default := "".
             %  Returns:
             %      s: string array "function this = NewClass(v1, v2, varargin)
@@ -302,11 +302,11 @@ classdef Newcl
             %                            this = this@mlsystem.SuperClass(v1, v2, varargin{:});
             %                            
             %                            ip = inputParser;
-            %                            ip.KeepUnmatched = true
-            %                            addRequired(ip, "v1", @(x) false)
-            %                            addRequired(ip, "v2", @(x) false)
-            %                            addParameter(ip, "varargin", [], @(x) false)
-            %                            parse(ip, v1, v2, varargin{:})
+            %                            ip.KeepUnmatched = true;
+            %                            addRequired(ip, "v1", @(x) true);
+            %                            addRequired(ip, "v2", @(x) true);
+            %                            addParameter(ip, "varargin", [], @(x) true);
+            %                            parse(ip, v1, v2, varargin{:});
             %                            ipr = ip.Results;
             %             
             %                       end"
@@ -380,9 +380,9 @@ classdef Newcl
             %                            early_code
             %                            
             %                            ip = inputParser;
-            %                            addRequired(ip, "v1", @(x) false)
-            %                            addRequired(ip, "v2", @(x) false)
-            %                            addParameter(ip, "varargin", [], @(x) false)
+            %                            addRequired(ip, "v1", @(x) true)
+            %                            addRequired(ip, "v2", @(x) true)
+            %                            addParameter(ip, "varargin", [], @(x) true)
             %                            parse(ip, v1, v2, varargin{:})
             %                            ipr = ip.Results;
             %             
@@ -693,8 +693,8 @@ classdef Newcl
         function s = ip_code(instr, varname)
             strarr = ascol(strtrim(strsplit(instr, ",")));
             isreq = ~contains(strarr, "varargin");
-            s = "addParameter(ip, """ + strarr + """, [], @(x) false)";
-            s(isreq) = "addRequired(ip, """ + strarr(isreq) + """, @(x) false)";
+            s = "addParameter(ip, """ + strarr + """, [], @(x) true)";
+            s(isreq) = "addRequired(ip, """ + strarr(isreq) + """, @(x) true)";
             s = strrep(s, "varargin", varname);
             s = ["ip = inputParser;"; ...
                  s; ...
